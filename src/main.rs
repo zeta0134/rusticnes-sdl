@@ -86,7 +86,7 @@ pub fn main() {
   for i in 0 .. windows.len() {
     let width = windows[i].panel.active_canvas().width;
     let height = windows[i].panel.active_canvas().height;
-    textures.push(texture_creators[i].create_texture(PixelFormatEnum::ABGR8888, TextureAccess::Streaming, width, height).unwrap());  
+    textures.push(texture_creators[i].create_texture(PixelFormatEnum::ARGB8888, TextureAccess::Streaming, width, height).unwrap());  
   }
 
   let mut application_events: Vec<events::Event> = Vec::new();
@@ -317,7 +317,7 @@ pub fn main() {
 
           let tx = windows[i].panel.active_canvas().width;
           let ty = windows[i].panel.active_canvas().height;
-          textures[i] = texture_creators[i].create_texture(PixelFormatEnum::ABGR8888, TextureAccess::Streaming, tx, ty).unwrap()
+          textures[i] = texture_creators[i].create_texture(PixelFormatEnum::ARGB8888, TextureAccess::Streaming, tx, ty).unwrap()
         }
       }
 
@@ -326,7 +326,10 @@ pub fn main() {
         if windows[i].panel.shown() {
           windows[i].panel.handle_event(&runtime_state, events::Event::RequestFrame);
           windows[i].canvas.set_draw_color(Color::RGB(255, 255, 255));
-          let _ = textures[i].update(None, &windows[i].panel.active_canvas().buffer, (windows[i].panel.active_canvas().width * 4) as usize);
+          //let _ = textures[i].update(None, &windows[i].panel.active_canvas().buffer, (windows[i].panel.active_canvas().width * 4) as usize);
+          let _ = textures[i].with_lock(None, |buffer: &mut [u8], _pitch: usize| {
+            buffer.copy_from_slice(&windows[i].panel.active_canvas().buffer);
+          });
           let _ = windows[i].canvas.copy(&textures[i], None, None);
           windows[i].canvas.present();
           windows[i].canvas.window_mut().show();
