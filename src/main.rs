@@ -1,5 +1,5 @@
 // Don't pop up a console automatically on Windows builds
-#![windows_subsystem = "windows"]
+//#![windows_subsystem = "windows"]
 
 extern crate image;
 extern crate nfd2;
